@@ -5,4 +5,178 @@
 	<fx:Declarations>
 		
 	</fx:Declarations>
+	
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.controls.Alert;
+			
+			// Conexão com o Red5
+			private var netConnection:NetConnection;
+			
+			// NetStream responsável por apresentar o vídeo
+			private var netStream_play:NetStream;
+			
+			// NetStream responsável por publicar o vídeo
+			private var netStream_publish:NetStream;
+			
+			// Canal para o Chat
+			private var sharedObject:SharedObject;
+			
+			// Componente para apresnetar o vídeo
+			private var video:Video
+			
+			// Nome da publicação do vídeo
+			private var streamingNome:String="publishVideo"
+			
+			/**
+			 * executa após carregar o aplicativo
+			 */
+			private function init():void
+			{
+				video=new Video();
+				
+				video.height=uiCaixaDoVideo.height;
+				video.width=uiCaixaDoVideo.width;
+			}
+			
+			/**
+			 * Inicia a aplicação e faz a conexão
+			 */
+			private function conectar():void
+			{
+				if ( hostRTMP.text.length < 15 )
+				{
+					Alert.show( "URL muito pequena!" )
+					return;
+				}
+				if ( nome.text.length < 3 )
+				{
+					Alert.show( "Nome tem que ter mais de 3 caracteres!" )
+					return;
+				}
+				if ( netConnection != null )
+					netConnection=null;
+				netConnection=new NetConnection();
+				netConnection.addEventListener( NetStatusEvent.NET_STATUS, netStatus );
+				netConnection.addEventListener( AsyncErrorEvent.ASYNC_ERROR, asyncError )
+				netConnection.connect( hostRTMP.text, nome.text );
+				netConnection.client=this;
+			}
+			
+			/**
+			 * Método que recebe a lista de usuários enviado pleo Red5
+			 */
+			public function listaUsuarios( lista:Array ):void
+			{
+				datagridUsuarios.dataProvider=lista;
+			}
+			
+			/**
+			 * Método que recebe o Status da conexão
+			 */
+			private function netStatus( e:NetStatusEvent ):void
+			{
+				switch ( e.info.code )
+				{
+					case "NetConnection.Connect.Success":
+						connectado()
+						viewstack.selectedIndex=1;
+						break;
+					case "NetConnection.Connect.Closed":
+						viewstack.selectedIndex=0;
+						break;
+					case "NetConnection.Connect.Rejected":
+						viewstack.selectedIndex=0;
+						break;
+					case "NetConnection.Connect.Failed":
+						viewstack.selectedIndex=0;
+						break;
+					default:
+						viewstack.selectedIndex=0;
+				}
+			}
+			
+			/**
+			 * Chamado quando deu sucesso na conexão com o Red5
+			 */
+			private function connectado():void
+			{
+				sharedObject=SharedObject.getRemote( "chat", netConnection.uri, true )
+				sharedObject.addEventListener( SyncEvent.SYNC, OnSync );
+				sharedObject.addEventListener( AsyncErrorEvent.ASYNC_ERROR, asyncError );
+				sharedObject.connect( netConnection );
+				sharedObject.client=this;
+				
+				netStream_play=new NetStream( netConnection )
+				video.attachNetStream( netStream_play );
+				uiCaixaDoVideo.addChild( video );
+				netStream_play.play( streamingNome );
+			}
+			
+			/**
+			 * Método responsável por tratar os AsyncErrorEvent
+			 */
+			private function asyncError( e:AsyncErrorEvent ):void
+			{
+				trace( e )
+			}
+			
+			/**
+			 * Método responsável por tratar os SyncEvent
+			 */
+			private function OnSync( e:SyncEvent ):void
+			{
+				trace( e )
+			}
+			
+			/**
+			 * Trata o click do Botão Publicar WebCam
+			 *
+			 * Se marcado publica, ao desmarcar para a publicação.
+			 */
+			private function publicar():void
+			{
+				if ( btPublicar.selected )
+				{
+					btPublicar.label="Parar publicação!"
+					
+					netStream_publish=new NetStream( netConnection );
+					netStream_publish.attachCamera( Camera.getCamera());
+					netStream_publish.attachAudio( Microphone.getMicrophone());
+					
+					// nome que será publicado
+					netStream_publish.publish( streamingNome );
+				}
+				else
+				{
+					btPublicar.label="Publicar no servidor RTMP!"
+					
+					netStream_publish.close()
+					netStream_publish=null
+				}
+			}
+			
+			/**
+			 * Envia o testo por Chat e limpa o campo.
+			 */
+			private function enviarMensagem():void
+			{
+				var msg:String="<p><b>" + nome.text + " diz:</b> " + mensagem.text + "</p>";
+				sharedObject.send( "recebemsg", msg );
+				
+				mensagem.text='';
+			}
+			
+			/**
+			 * Recebe as mensagens postada no Chat
+			 */
+			public function recebemsg( msg:String ):void
+			{
+				areaMensagem.htmlText+=msg;
+				areaMensagem.validateNow();
+				areaMensagem.verticalScrollPosition=areaMensagem.maxVerticalScrollPosition;
+			}
+		]]>
+	</fx:Script>
 </s:Application>
