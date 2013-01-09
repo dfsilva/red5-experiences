@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:mx="http://www.adobe.com/2006/mxml" horizontalAlign="center" verticalAlign="middle" creationComplete="onCreationComplete(event)">
+
+	<mx:Script>
+		<![CDATA[
+			import com.beauscott.examples.vo.DynamicModuleVO;
+			import com.beauscott.examples.UserManager;
+			import mx.controls.Alert;
+			import mx.validators.StringValidator;
+			import com.beauscott.examples.vo.UserVO;
+		
+			/**
+			 * Just a temporary dictionary of available users... not part of any real implementation
+			 */
+			private var _users:Object;
+			
+			protected function onCreationComplete(event:Event) : void
+			{
+				// create some dummy data to authenticate against. This is not part of any real implementation.
+				// In the real world, you'd authenticate your users against a backend service, but this is just
+				// an example class, so we're dummying it up here.
+				
+				var mod1:DynamicModuleVO = new DynamicModuleVO();
+				mod1.name = "Module 1";
+				mod1.classname = 'com.beauscott.examples.modules.Module1';
+				
+				var mod2:DynamicModuleVO = new DynamicModuleVO();
+				mod2.name = "Module 2";
+				mod2.classname = 'com.beauscott.examples.modules.Module2';
+				
+				var mod3:DynamicModuleVO = new DynamicModuleVO();
+				mod3.name = "Module 3";
+				mod3.classname = 'com.beauscott.examples.modules.Module3';
+				
+				_users = {};
+				
+				var user1:UserVO = new UserVO();
+				user1.username = 'user1';
+				user1.password = 'password';
+				user1.authorizedModules = [
+					mod1, mod2, mod3
+				];
+				_users.user1 = user1;
+				
+				var user2:UserVO = new UserVO();
+				user2.username = 'user2';
+				user2.password = 'password';
+				user2.authorizedModules = [mod2];
+				_users.user2 = user2;
+				
+				var user3:UserVO = new UserVO();
+				user3.username = 'user3';
+				user3.password = 'password';
+				user3.authorizedModules = [mod3, mod2];
+				_users.user3 = user3;
+				
+			}
+		
+			protected function onLogin(event:Event) : void
+			{
+				// Validate the input... do whatever you want for validation, I'm just gonna check for length.
+				// You'd probably want to do something fancy with a string validator...
+				if(username.text.length < 1)
+				{
+					Alert.show('You must enter a username!');
+					return;
+				}
+				
+				if(password.text.length < 1)
+				{
+					Alert.show('You must enter a password!');
+					return;
+				}
+				
+				//This is where you'd normally interface with an authentication service. I'm just gonna shortcut this
+				//with an internal authentication method, but you can see the idea.
+				authenticate(username.text, password.text);
+			}
+			
+			protected function authenticate(un:String, pass:String) : void
+			{
+				if(_users.hasOwnProperty(un))
+				{
+					if(_users[un].password == pass)
+					{
+						UserManager.getInstance().login(_users[un] as UserVO);
+						return;
+					}
+				}
+				Alert.show('Login failed!');
+			}
+			
+		]]>
+	</mx:Script>
+
+	<mx:Panel>
+		<mx:Form width="100%" height="100%">
+			<mx:FormHeading width="100%" label="Login" />
+			<mx:FormItem id="usernameFormItem" width="100%" label="Username" required="true">
+				<mx:TextInput id="username"  enter="onLogin(event)"/>
+			</mx:FormItem>
+			<mx:FormItem id="passwordFormItem" width="100%" label="Password" required="true">
+				<mx:TextInput id="password" displayAsPassword="true" enter="onLogin(event)" />
+			</mx:FormItem>
+			<mx:FormItem>
+				<mx:Button click="onLogin(event)" label="Login" />
+			</mx:FormItem>
+			<mx:Text>
+				<mx:text>Try user1, user2 or user3, each with "password" as their password.</mx:text>
+			</mx:Text>
+		</mx:Form>	
+	</mx:Panel>
+	
+</mx:Module>

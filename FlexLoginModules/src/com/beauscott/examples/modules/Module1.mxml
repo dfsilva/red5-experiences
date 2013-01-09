@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:mx="http://www.adobe.com/2006/mxml" verticalAlign="middle" horizontalAlign="center">
+	<mx:Script>
+		<![CDATA[
+			import com.beauscott.examples.UserManager;
+			
+			protected function onLogoutButtonClick(event:Event) : void
+			{
+				UserManager.getInstance().logout();
+			}
+			
+		]]>
+	</mx:Script>
+	<mx:Panel width="200" height="200">
+		<mx:FormHeading label="Module1" />
+		<mx:Button click="onLogoutButtonClick(event)" label="Logout" />
+	</mx:Panel>
+</mx:Module>

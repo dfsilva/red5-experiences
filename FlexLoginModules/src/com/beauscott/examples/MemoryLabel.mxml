@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:ApplicationControlBar xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="onCreationComplete(event)">
+	<mx:Script>
+		<![CDATA[
+			
+			private var cmv:Number = 0;
+			private var dv:Number = 0;
+			private var puv:Number = 0;
+			private var lmv:Number = 0;
+			
+			protected function onCreationComplete(event:Event) : void
+			{
+				var timer:Timer = new Timer(500, 0);
+				timer.addEventListener(TimerEvent.TIMER, onTimer);
+				timer.start();	
+			}
+			
+			protected function onTimer(event:Event) : void
+			{
+				lmv = cmv;
+				cmv = flash.system.System.totalMemory;
+				if(puv < cmv)
+					puv = cmv;
+				dv = cmv - lmv;
+				
+				cmu.text = makeReadable(cmv);
+				pu.text = makeReadable(puv);
+				d.text = dv > 0 ? '+' + makeReadable(dv) : makeReadable(dv);
+				
+			}
+			
+			private function makeReadable(mv:Number) : String
+			{
+				return (Math.round((mv / 1024) * 100) / 100).toString() + ' KB';
+			}
+			
+			
+		]]>
+	</mx:Script>
+	
+	<mx:Label text="Current Memory Usage:"/>
+	<mx:Label id="cmu" />
+	
+	<mx:Label text="Delta:" />
+	<mx:Label id="d" />
+	
+	<mx:Label text="Peak Usage:" />
+	<mx:Label id="pu" />
+	
+</mx:ApplicationControlBar>

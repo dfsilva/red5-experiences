@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:DataGrid xmlns:mx="http://www.adobe.com/2006/mxml" doubleClickEnabled="true">
+	<mx:columns>
+		<mx:DataGridColumn dataField="name" headerText="Application Name" />
+	</mx:columns>
+</mx:DataGrid>
