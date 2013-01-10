@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application initialize="initCollections()"
+	xmlns:programmatic="assets.programmatic.*" 
+	preloader="assets.programmatic.CustomPreloader"
+	viewSourceURL="srcview/index.html" 
+	xmlns:fx="http://ns.adobe.com/mxml/2009"
+	xmlns:s="library://ns.adobe.com/flex/spark"
+	xmlns:mx="library://ns.adobe.com/flex/halo" xmlns:mx1="library://ns.adobe.com/flex/mx">
+	
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+
+	<fx:Style source="/css/skinPreview.css/"/>
+	
+	<fx:declarations>
+		<fx:XMLList id="treeData">
+			<node label="Mail Box">
+				<node label="Inbox">
+					<node label="Marketing"/>
+					<node label="Product Management"/>
+					<node label="Personal"/>
+				</node>
+				<node label="Outbox">
+					<node label="Professional"/>
+					<node label="Personal"/>
+				</node>
+				<node label="Spam"/>
+				<node label="Sent"/>
+			</node>	
+		</fx:XMLList>
+		
+		<fx:Model id="listData" source="/assets/xml/listData.xml"/>
+		
+		
+		<fx:XMLList id="employees">
+			<employee>
+				<name>Christina Coenraets</name>
+				<phone>555-219-2270</phone>
+				<email>ccoenraets@fictitious.com</email>
+				<active>true</active>
+			</employee>
+			<employee>
+				<name>Joanne Wall</name>
+				<phone>555-219-2012</phone>
+				<email>jwall@fictitious.com</email>
+				<active>true</active>
+			</employee>
+			<employee>
+				<name>Maurice Smith</name>
+				<phone>555-219-2012</phone>
+				<email>maurice@fictitious.com</email>
+				<active>false</active>
+			</employee>
+			<employee>
+				<name>Mary Jones</name>
+				<phone>555-219-2000</phone>
+				<email>mjones@fictitious.com</email>
+				<active>true</active>
+			</employee>
+		</fx:XMLList>
+	</fx:declarations>
+	
+	<fx:Script>
+        <![CDATA[
+        	import mx.managers.CursorManager;
+        	import mx.events.CloseEvent;
+        	import com.SampleTitleWindow;
+            import mx.events.MenuEvent;
+            import mx.controls.Alert;
+            import mx.collections.*;
+            import mx.managers.PopUpManager;
+            import mx.controls.Alert;
+            
+            public function openWindow():void
+            {
+            	PopUpManager.createPopUp(this,SampleTitleWindow,false);
+            }
+            
+            public function showAlert():void
+            {
+				Alert.show("This is a sample Alert.","Alert");              
+            }
+
+            [Bindable]
+            public var menuBarCollection:XMLListCollection;
+    
+            private var menubarXML:XMLList =
+                <>
+                    <menuitem label="Menu1" data="top">
+                        <menuitem label="MenuItem 1-A" data="1A"/>
+                        <menuitem label="MenuItem 1-B" data="1B"/>
+                    </menuitem>
+                    <menuitem label="Menu2" data="top">
+                        <menuitem label="MenuItem 2-A" type="check"  data="2A"/>
+                        <menuitem type="separator"/>
+                        <menuitem label="MenuItem 2-B" >
+                            <menuitem label="SubMenuItem 3-A" type="radio"
+                                groupName="one" data="3A"/>
+                            <menuitem label="SubMenuItem 3-B" type="radio"
+                                groupName="one" data="3B"/>
+                        </menuitem>
+                    </menuitem>
+                </>;
+
+            // Event handler to initialize the MenuBar control.
+            private function initCollections():void {
+                menuBarCollection = new XMLListCollection(menubarXML);
+            }
+         ]]>
+    </fx:Script>
+    
+   
+
+	
+
+	<mx1:MenuBar top="5" right="5" left="5" dataProvider="{ menuBarCollection }" labelField="@label" height="26"/>
+	<mx1:Panel width="800" height="450" layout="absolute" horizontalCenter="0" title="Panel" verticalCenter="0"> 
+		<mx1:TabNavigator x="0" y="0" width="100%" height="100%" fontWeight="normal">
+			<mx1:Canvas label="Controls" width="100%" height="100%">
+				<mx1:Button x="10" y="10" label="Button" styleName="buttonNoOfficial" fontWeight="normal" height="21" enabled="true"/>
+				<mx1:CheckBox x="90" y="10" label="Checkbox" enabled="true"/>
+				<mx1:HBox x="243" y="10" verticalAlign="middle" horizontalGap="4">
+					<mx1:ColorPicker width="19" height="19" selectedColor="#CCCCCC" enabled="true"/>
+					<mx1:Label text="Color Picker" height="15" styleName="myText"/>
+				</mx1:HBox>
+				<mx1:ComboBox x="127" y="40" prompt="Combo Box" enabled="true" height="21">
+					<mx1:dataProvider>
+						<fx:Array>
+							<fx:Object label="Item 1"/>
+							<fx:Object label="Item 2"/>
+							<fx:Object label="Item 3"/>
+							<fx:Object label="Item 4"/>
+						</fx:Array>
+					</mx1:dataProvider>
+				</mx1:ComboBox>
+				<mx1:DateChooser x="594" y="10" fontWeight="normal" enabled="true"/>
+				<programmatic:MyDateField x="338" y="10" width="100" height="21" enabled="true"/>
+				<mx1:HSlider x="243" y="77"/>
+				<mx1:Label text="(rollover here to show busy cursor)" rollOver="CursorManager.setBusyCursor()" rollOut="CursorManager.removeBusyCursor()"  x="243" y="113"/>
+				<mx1:LinkButton x="387" y="40" label="LinkButton" fontWeight="normal" height="21" enabled="true"/>
+				<mx1:NumericStepper x="450" y="10" height="21" enabled="true"/>
+				<mx1:PopUpButton x="10" y="40" label="PopUpButton" fontWeight="normal" enabled="true" height="21"/>
+				<mx1:PopUpMenuButton x="243" y="40" label="PopUpMenuButton" fontWeight="normal" height="21" enabled="true"/>
+				<mx1:ProgressBar x="10" y="77" width="200" labelPlacement="bottom" indeterminate="true"/>
+				<mx1:RadioButton x="178" y="10" label="Radio" enabled="true"/>
+				<mx1:VSlider x="516" y="10"/>
+				<mx1:HBox x="10" y="113" verticalAlign="middle">
+					<mx1:HRule/>
+					<mx1:Label text="HRule" styleName="myText"/>
+				</mx1:HBox>
+				<mx1:HBox x="164" y="113" verticalAlign="middle">
+					<mx1:VRule/>
+					<mx1:Label text="VRule" styleName=""/>
+				</mx1:HBox>
+			</mx1:Canvas>
+			<mx1:Canvas label="Navigation" width="100%" height="100%">
+				<mx1:VBox x="218" y="10">
+					<mx1:Label text="ButtonBar" styleName="myText"/>
+					<mx1:ButtonBar>
+						<mx1:dataProvider>
+							<fx:Array>
+								<fx:Object label="Button 1"/>
+								<fx:Object label="Button 2"/>
+								<fx:Object label="Button 3"/>
+								<fx:Object label="Button 4"/>
+							</fx:Array>
+						</mx1:dataProvider>
+					</mx1:ButtonBar>
+				</mx1:VBox>
+				<mx1:VBox x="218" y="71">
+					<mx1:Label text="ToggleButtonBar" styleName="myText"/>
+					<mx1:ToggleButtonBar>
+						<mx1:dataProvider>
+							<fx:Array>
+								<fx:Object label="Button 1"/>
+								<fx:Object label="Button 2"/>
+								<fx:Object label="Button 3"/>
+								<fx:Object label="Button 4"/>
+							</fx:Array>
+						</mx1:dataProvider>
+					</mx1:ToggleButtonBar>
+				</mx1:VBox>
+				<mx1:VBox x="218" y="133">
+					<mx1:Label text="TabBar" styleName="myText"/>
+					<mx1:TabBar>
+						<mx1:dataProvider>
+							<fx:Array>
+								<fx:Object label="Tab 1"/>
+								<fx:Object label="Tab 2"/>
+								<fx:Object label="Tab 3"/>
+								<fx:Object label="Tab 4"/>
+							</fx:Array>
+						</mx1:dataProvider>
+					</mx1:TabBar>
+				</mx1:VBox>
+				<mx1:VBox x="218" y="191" verticalGap="0">
+					<mx1:Label text="LinkBar" styleName="myText"/>
+					<mx1:LinkBar>
+						<fx:Object label="Link 1"/>
+						<fx:Object label="Link 2"/>
+						<fx:Object label="Link 3"/>
+						<fx:Object label="Link 4"/>
+					</mx1:LinkBar>
+				</mx1:VBox>
+				<mx1:VBox x="10" y="10">
+					<mx1:Label text="Accordion" styleName="myText"/>
+					<mx1:Accordion width="200" height="200">
+						<mx1:Canvas label="Accordion Header 1" width="100%" height="100%" fontWeight="normal" styleName="myAccordion">
+						</mx1:Canvas>
+						<mx1:Canvas label="Accordion Header 2" width="100%" height="100%" styleName="myAccordion">
+						</mx1:Canvas>
+						<mx1:Canvas label="Accordion Header 3" width="100%" height="100%" styleName="myAccordion">
+						</mx1:Canvas>
+					</mx1:Accordion>
+				</mx1:VBox>
+				<mx1:VBox x="526" y="10">
+					<mx1:Label text="Tree" styleName="myText"/>
+					<mx1:Tree width="200" height="240" dataProvider="{ treeData }" labelField="@label" showRoot="false"/>
+				</mx1:VBox>
+			</mx1:Canvas>
+			<mx1:Canvas label="Text" width="100%" height="100%">
+				<mx1:TextArea x="218" y="9" text="TextArea, praesent a purus. Sed tempor elit non nisi. Vivamus ullamcorper mauris quis libero. Fusce pretium, risus vitae suscipit gravida, nisi eros tristique ligula, nec ultricies dolor sapien ac erat. Suspendisse cursus gravida turpis. Fusce consequat sollicitudin eros. Ut id purus. Donec velit. Integer nisi erat, viverra non, accumsan eget, facilisis eget, neque. Duis at nunc ac ligula hendrerit molestie. In dui orci, tincidunt elementum, fringilla id, gravida sed, sem. Vivamus libero. Vivamus mollis. " width="200" height="100"/>
+				<mx1:TextInput x="426" y="8" text="TextInput" height="22" styleName="personalTextInput"/>
+				<mx1:VBox x="10" y="10">
+					<mx1:Label text="Text"/>
+					<mx1:Text text="Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Praesent vel libero ut libero interdum aliquam. Morbi in massa. Suspendisse ultrices velit nec leo." width="200" height="100" styleName="myText"/>
+				</mx1:VBox>
+			</mx1:Canvas>
+			<mx1:Canvas label="Lists" width="100%" height="100%">
+				<mx1:VBox x="321" bottom="8" top="10">
+					<mx1:Label text="List" styleName="myText"/>
+					<mx1:List height="100%" width="160">
+						<mx1:dataProvider>
+							<fx:Array>
+								<fx:Object label="Flex"/>
+								<fx:Object label="Illustrator"/>
+								<fx:Object label="Photoshop"/>
+								<fx:Object label="Fireworks"/>
+								<fx:Object label="Flash"/>
+								<fx:Object label="Adobe AIR"/>
+							</fx:Array>
+						</mx1:dataProvider>
+					</mx1:List>
+				</mx1:VBox>
+				<mx1:VBox x="490" bottom="8" top="10">
+					<mx1:Label text="TileList" styleName="myText"/>
+					<mx1:TileList width="278" height="100%" dataProvider="{ listData.item }">
+						<mx1:itemRenderer>
+						<fx:Component>
+							<mx1:VBox paddingTop="4" paddingRight="4" paddingBottom="4" paddingLeft="4">
+								<mx1:Image source="{ data.image }" width="90" height="90"/>
+							</mx1:VBox>
+						</fx:Component>
+					</mx1:itemRenderer>
+					</mx1:TileList>
+				</mx1:VBox>
+				<mx1:VBox x="10" y="10">
+					<mx1:Label text="DataGrid" styleName="myText"/>
+					<mx1:DataGrid dataProvider="{ employees }" height="139">
+						<mx1:columns>
+			                <mx1:DataGridColumn dataField="name" headerText="Name"/>
+			                <mx1:DataGridColumn dataField="phone" headerText="Phone"/>
+			                <mx1:DataGridColumn dataField="email" headerText="Email"/>
+			            </mx1:columns>
+					</mx1:DataGrid>
+				</mx1:VBox>
+				<mx1:VBox x="10" bottom="8" height="151">
+					<mx1:Label text="HorizontalList" styleName="myText"/>
+					<mx1:HorizontalList width="302" height="125" dataProvider="{ listData.item }">
+						<mx1:itemRenderer>
+							<fx:Component>
+								<mx1:VBox paddingTop="4" paddingRight="4" paddingBottom="4" paddingLeft="4">
+									<mx1:Image source="{ data.image }" width="90" height="90"/>
+								</mx1:VBox>
+							</fx:Component>
+						</mx1:itemRenderer>
+					</mx1:HorizontalList>
+				</mx1:VBox>
+			</mx1:Canvas>
+		</mx1:TabNavigator>
+		<mx1:ControlBar>
+			<mx1:Label text="Control Bar" width="100%"/>
+			<mx1:Button label="Preview Alert" click="showAlert()" styleName="buttonOfficial" fontWeight="normal" height="21"/>
+			<mx1:Button label="Preview TitleWindow" click="openWindow()" styleName="buttonOfficial" fontWeight="normal" height="21"/>
+		</mx1:ControlBar>
+	</mx1:Panel>
+	
+</s:Application>
