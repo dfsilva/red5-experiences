@@ -82,18 +82,23 @@
 					case "NetConnection.Connect.Success":
 						connectado()
 						viewstack.selectedIndex=1;
+						Alert.show("Conexao Efetuada com sucesso!");
 						break;
 					case "NetConnection.Connect.Closed":
 						viewstack.selectedIndex=0;
+						Alert.show("Conexao Fechada!");
 						break;
 					case "NetConnection.Connect.Rejected":
 						viewstack.selectedIndex=0;
+						Alert.show("Conexao Rejeitada!");
 						break;
 					case "NetConnection.Connect.Failed":
 						viewstack.selectedIndex=0;
+						Alert.show("Conexao Falhou!");
 						break;
 					default:
 						viewstack.selectedIndex=0;
+						Alert.show("Status de rede retornado desconhecido!");
 				}
 			}
 			
@@ -179,4 +184,63 @@
 			}
 		]]>
 	</fx:Script>
+	
+	<mx:ViewStack id="viewstack"
+				  width="100%"
+				  height="100%"
+				  creationPolicy="all">
+		<mx:VBox width="100%"
+				 height="100%"
+				 verticalAlign="middle"
+				 horizontalAlign="center">
+			<mx:Form>
+				<mx:FormItem label="URL do servidor:" fontWeight="bold">
+					<mx:TextInput id="hostRTMP"
+								  text="rtmp://localhost/confDemo"
+								  width="200"
+								  fontWeight="normal"/>
+				</mx:FormItem>
+				<mx:FormItem label="Nome:" fontWeight="bold">
+					<mx:TextInput id="nome" width="200" fontWeight="normal"/>
+				</mx:FormItem>
+				<mx:FormItem>
+					<mx:Button label="Conectar no Red5" click="conectar()" fontWeight="normal"/>
+				</mx:FormItem>
+			</mx:Form>
+		</mx:VBox>
+		<mx:VBox width="100%" height="100%">
+			<mx:HBox width="100%" height="100%">
+				<mx:VBox height="100%">
+					<mx:Canvas left="10"
+							   top="85"
+							   width="160"
+							   height="120"
+							   backgroundColor="#000000">
+						<mx:UIComponent width="100%" height="100%" id="uiCaixaDoVideo"/>
+					</mx:Canvas>
+					<mx:Button id="btPublicar"
+							   label="Publicar WebCam"
+							   click="publicar()"
+							   toggle="true"/>
+					<mx:DataGrid id="datagridUsuarios" width="100%" height="100%">
+						<mx:columns>
+							<mx:DataGridColumn headerText="Usuários" dataField="USER_NOME"/>
+						</mx:columns>
+					</mx:DataGrid>
+				</mx:VBox>
+				<mx:VBox height="100%" width="100%">
+					<mx:TextArea id="areaMensagem"
+								 width="100%"
+								 height="100%"
+								 borderStyle="none"
+								 alpha="0.63"
+								 editable="false"/>
+					<mx:HBox width="100%">
+						<mx:TextInput id="mensagem" width="100%" enter="enviarMensagem()"/>
+						<mx:Button label="Enviar" click="enviarMensagem()"/>
+					</mx:HBox>
+				</mx:VBox>
+			</mx:HBox>
+		</mx:VBox>
+	</mx:ViewStack>
 </s:Application>

@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.red5.core.domain.User;
 import org.red5.server.adapter.ApplicationAdapter;
+import org.red5.server.api.IClient;
 import org.red5.server.api.IConnection;
 import org.red5.server.api.scope.IScope;
 import org.red5.server.api.service.IPendingServiceCall;
@@ -40,11 +41,16 @@ import org.red5.server.api.service.ServiceUtils;
 public class Application extends ApplicationAdapter implements
 		IPendingServiceCallback {
 
-	protected HashMap users = new HashMap();
+	protected HashMap<String, User> users = new HashMap<String, User>();
 
-	/** {@inheritDoc} */
 	@Override
-	public boolean connect(IConnection conn, IScope scope, Object[] params) {
+	public boolean appStart(IScope scope) {
+		return true;
+	}
+
+	@Override
+	public boolean appConnect(IConnection conn, Object[] params) {
+		// quem não envia nome, não ganha conexão
 		if (params.length != 1) {
 			rejectClient("Sem permissão de acesso ao sistema!");
 			return false;
@@ -63,33 +69,51 @@ public class Application extends ApplicationAdapter implements
 		return true;
 	}
 
-	/** {@inheritDoc} */
 	@Override
-	public void disconnect(IConnection conn, IScope scope) {
+	public boolean appJoin(IClient client, IScope scope) {
+
+		super.appJoin(client, scope);
+
+		// envia a lista de usuários conectados a todos os conectados
+		enviarNovosUsuarios();
+
+		return true;
+	}
+
+	@Override
+	public synchronized void disconnect(IConnection conn, IScope scope) {
+		// ID da conexão do usuário
+		String uid = conn.getClient().getId();
+		// O usuário que desconectou
+		users.remove(uid);
+		enviarNovosUsuarios();
+
+		System.out.println("Desconectado: " + uid);
 		super.disconnect(conn, scope);
 	}
 
 	@Override
-	public void resultReceived(IPendingServiceCall arg0) {
-		System.out.println(arg0);
+	public void resultReceived(IPendingServiceCall call) {
+		System.out.println(call);
 	}
 
-	@Override
-	public synchronized boolean start(IScope scope) {
-		return super.start(scope);
-	}
-
+	/**
+	 * Envia a lista de usuários conectados a todos os usuarios
+	 */
 	protected void enviarNovosUsuarios() {
 		Object[] params = new Object[] { listaUsuarios() };
 		ServiceUtils.invokeOnAllConnections(scope, "listaUsuarios", params);
 	}
 
-	protected HashMap listaUsuarios() {
-		HashMap params = new HashMap();
+	/**
+	 * Retorna a lista de usuários sem os campos nulos
+	 */
+	protected HashMap<Integer, User> listaUsuarios() {
+		HashMap<Integer, User> params = new HashMap<Integer, User>();
 		Integer key = 0;
-		Set s = users.keySet();
-		for (Iterator it = s.iterator(); it.hasNext();) {
-			User value = (User) users.get(it.next());
+		Set<String> s = users.keySet();
+		for (Iterator<String> it = s.iterator(); it.hasNext();) {
+			User value = users.get(it.next());
 			if (value != null) {
 				params.put(key, value);
 				key++;
@@ -97,5 +121,4 @@ public class Application extends ApplicationAdapter implements
 		}
 		return params;
 	}
-
 }

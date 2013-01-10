@@ -15,6 +15,7 @@
   </compiler>
   <applications>
     <application path="Main.mxml"/>
+    <application path="LiveVideo.mxml"/>
   </applications>
   <modules/>
   <buildCSSFiles/>
