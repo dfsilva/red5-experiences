@@ -3,17 +3,16 @@
  The main application file for the Dashboard demo app.
  Loads the layout XML and creates PodLayoutManagers.
 -->
-<mx:Application
-	xmlns:mx="http://www.adobe.com/2006/mxml"
-	horizontalAlign="left"
+<s:Application
+  xmlns:fx="http://ns.adobe.com/mxml/2009"
+  xmlns:s="library://ns.adobe.com/flex/spark"
+  xmlns:mx="library://ns.adobe.com/flex/mx"
 	minWidth="600" minHeight="600"
 	width="100%" height="100%"
-	backgroundSize="100%"
 	backgroundColor="#ffffff"
-	paddingLeft="45" paddingRight="45" paddingBottom="35" paddingTop="34"
-	applicationComplete="onApplicationComplete()" viewSourceURL="srcview/index.html">
-	<mx:Style source="/assets/styles.css" />
-	<mx:Script>
+	applicationComplete="onApplicationComplete()"
+  skinClass="skins.CustomApplicationSkin">
+	<fx:Script>
 		<![CDATA[
 			import com.esria.samples.dashboard.events.LayoutChangeEvent;
 			import com.esria.samples.dashboard.managers.PodLayoutManager;
@@ -24,11 +23,11 @@
 			import com.esria.samples.dashboard.view.PieChartContent;
 			import com.esria.samples.dashboard.view.Pod;
 			import com.esria.samples.dashboard.view.PodContentBase;
-			import mx.containers.Canvas;
+      import spark.components.NavigatorContent;
 			import mx.controls.Alert;
 			import mx.events.FlexEvent;
 			import mx.events.IndexChangedEvent;
-			import mx.events.ItemClickEvent;
+      import spark.events.IndexChangeEvent;
 			import mx.rpc.events.FaultEvent;
 			import mx.rpc.events.ResultEvent;
 			import mx.rpc.http.HTTPService;
@@ -68,11 +67,9 @@
 				for (var i:Number = 0; i < len; i++) // Loop through the view nodes.
 				{
 					// Create a canvas for each view node.
-					var canvas:Canvas = new Canvas();
+          var canvas:NavigatorContent = new NavigatorContent();
 					// PodLayoutManager handles resize and should prevent the need for
 					// scroll bars so turn them off so they aren't visible during resizes.
-					canvas.horizontalScrollPolicy = "off";
-					canvas.verticalScrollPolicy = "off";
 					canvas.label = viewXMLList[i].@label;
 					canvas.percentWidth = 100;
 					canvas.percentHeight = 100;
@@ -92,13 +89,13 @@
 				// Make sure the index is not out of range.
 				// This can happen if a tab view was saved but then tabs were subsequently removed from the XML.
 				index = Math.min(tabBar.numChildren - 1, index);
-				onItemClickTabBar(new ItemClickEvent(ItemClickEvent.ITEM_CLICK, false, false, null, index));
+        onItemClickTabBar(new IndexChangeEvent(IndexChangeEvent.CHANGE, false, false, -1, index));
 				tabBar.selectedIndex = index;
 			}
 			
-			private function onItemClickTabBar(e:ItemClickEvent):void
+			private function onItemClickTabBar(e:IndexChangeEvent):void
 			{
-				var index:Number = e.index;
+				var index:Number = e.newIndex;
 				StateManager.setViewIndex(index); // Save the view index.
 				
 				viewStack.selectedIndex = index;
@@ -142,7 +139,7 @@
 						var pod:Pod = new Pod();
 						pod.id = podId;
 						pod.title = podXMLList[j].@title;
-						pod.addChild(podContent);
+            pod.addElement(podContent);
 						var index:Number;
 						
 						if (StateManager.isPodMinimized(viewId, podId))
@@ -194,14 +191,18 @@
 				StateManager.setPodViewIndex(viewId, pod.id, e.newIndex);
 			}
 		]]>
-	</mx:Script>
-	<mx:TabBar
+	</fx:Script>
+  <s:layout>
+    <s:VerticalLayout horizontalAlign="left" paddingLeft="45" 
+      paddingRight="45" paddingBottom="35" paddingTop="34"/>
+  </s:layout>  
+	<s:TabBar
 		id="tabBar"
-		itemClick="onItemClickTabBar(event)"
+    change="onItemClickTabBar(event)"
 		height="35" 
-		dataProvider="viewStack" />
+		dataProvider="{viewStack}" skinClass="skins.CustomTabBarSkin"/>
 	<mx:ViewStack
 		id="viewStack"
 		paddingTop="15"
 		width="100%" height="100%" />
-</mx:Application>
+</s:Application>

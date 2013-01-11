@@ -178,7 +178,7 @@ public class RollOverWedgeItemRenderer extends UIComponent implements IDataRende
 		if(!isNaN(fillColor))
 			g.beginFill(fillColor);
 		else
-			f.begin(g,rc);
+      f.begin(g,rc, new Point(rc.left,rc.top));
 
 		GraphicsUtilities.setLineStyle(g, radialStroke);
 

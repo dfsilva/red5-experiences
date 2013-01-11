@@ -12,8 +12,8 @@ import flash.events.EventDispatcher;
 import flash.events.MouseEvent;
 import flash.geom.Point;
 import flash.geom.Rectangle;
-import mx.containers.Canvas;
-import mx.core.Application;
+import spark.components.NavigatorContent;
+import mx.core.FlexGlobals;
 import mx.effects.Move;
 import mx.effects.Parallel;
 import mx.effects.Resize;
@@ -39,7 +39,7 @@ public class PodLayoutManager extends EventDispatcher
 	private var currentDropIndex:Number;					// The index of where to drop the pod while dragging.
 	private var currentDragPodMove:Move;					// The move effect used to transition the pod after it is released from dragging.
 	
-	private var _container:Canvas;							// The container which holds all of the pods.
+	private var _container:NavigatorContent;							// The container which holds all of the pods.
 	
 	private var parallel:Parallel;							// The main effect container.
 	private var maximizeParallel:Parallel;
@@ -74,12 +74,12 @@ public class PodLayoutManager extends EventDispatcher
 	}
 	
 	// Sets the canvas which will hold the pods.
-	public function set container(canvas:Canvas):void
+	public function set container(canvas:NavigatorContent):void
 	{
 		_container = canvas;
 	}
 	
-	public function get container():Canvas
+	public function get container():NavigatorContent
 	{
 		return _container;
 	}
@@ -109,7 +109,7 @@ public class PodLayoutManager extends EventDispatcher
 	
 	private function initItem(pod:Pod):void
 	{
-		container.addChild(pod);
+    container.addElement(pod);
 		
 		pod.addEventListener(DragEvent.DRAG_START, onDragStartPod);
 		pod.addEventListener(DragEvent.DRAG_COMPLETE, onDragCompletePod);
@@ -121,7 +121,7 @@ public class PodLayoutManager extends EventDispatcher
 		var dragHighlight:DragHighlight = new DragHighlight();
 		dragHighlight.visible = false;
 		dragHighlightItems.push(dragHighlight);
-		container.addChild(dragHighlight);
+    container.addElement(dragHighlight);
 	}
 	
 	// Pod has been maximized.
@@ -210,12 +210,12 @@ public class PodLayoutManager extends EventDispatcher
 		}
 		
 		// Use the stage so we get mouse events outside of the browser window.
-		Application.application.stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
+		FlexGlobals.topLevelApplication.stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
 	}
 	
 	private function onDragCompletePod(e:DragEvent):void
 	{
-		Application.application.stage.removeEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
+    FlexGlobals.topLevelApplication.stage.removeEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
 		
 		if (currentVisibleHighlight != null)
 			currentVisibleHighlight.visible = false;
@@ -393,7 +393,7 @@ public class PodLayoutManager extends EventDispatcher
 				
 				// Move the pod to the top of the z-index. It will not be at the top if we are coming from a saved state
 				// and the pod is not the last one.
-				container.setChildIndex(pod, container.numChildren - 1);
+        container.setElementIndex(pod, container.numElements - 1);
 			}
 			else
 			{
@@ -468,7 +468,7 @@ public class PodLayoutManager extends EventDispatcher
 				dragHighlight.y = point.y;
 				dragHighlight.width = itemWidth;
 				dragHighlight.height = itemHeight;
-				container.setChildIndex(dragHighlight, i); // Move the hightlights to the bottom of the z-index.
+        container.setElementIndex(dragHighlight, i); // Move the hightlights to the bottom of the z-index.
 			}
 		}
 	}

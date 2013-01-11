@@ -9,10 +9,14 @@ import flash.display.Graphics;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
-import mx.containers.HBox;
-import mx.containers.Panel;
-import mx.controls.Button;
+import spark.components.HGroup;
+import spark.components.Panel;
+import spark.components.Button;
+import spark.components.ToggleButton;
 import mx.events.DragEvent;
+import spark.components.Group;
+import spark.primitives.Rect;
+import skins.CustomPanelSkin;
 
 // Drag events.
 [Event(name="dragStart", type="mx.events.DragEvent")]
@@ -22,6 +26,7 @@ import mx.events.DragEvent;
 [Event(name="maximize", type="com.esria.samples.dashboard.events.PodStateChangeEvent")]
 [Event(name="restore", type="com.esria.samples.dashboard.events.PodStateChangeEvent")]
 
+[SkinState("minimized")];
 public class Pod extends Panel
 {
 	public static const MINIMIZED_HEIGHT:Number = 22;
@@ -32,12 +37,19 @@ public class Pod extends Panel
 	public var windowState:Number; // Corresponds to one of the WINDOW_STATE variables.
 	public var index:Number;	   // Index within the layout.
 	
-	private var controlsHolder:HBox;
+  [SkinPart(required="false")]
+  public var controlsHolder:HGroup;
 	
-	private var minimizeButton:Button;
-	private var maximizeRestoreButton:Button;
+  [SkinPart(required="false")]
+  public var minimizeButton:Button;
+  [SkinPart(required="false")]
+  public var maximizeRestoreButton:ToggleButton;
 	
-	private var headerDivider:Sprite;
+  [SkinPart(required="false")]
+  public var headerDivider:Rect;
+  
+  [SkinPart(required="false")]
+  public var titleBar:Group;
 	
 	// Variables used for dragging the pod.
 	private var dragStartMouseX:Number;
@@ -57,73 +69,16 @@ public class Pod extends Panel
 	{
 		super();
 		doubleClickEnabled = true;
-		setStyle("titleStyleName", "podTitle");
-		
 		windowState = WINDOW_STATE_DEFAULT;
-		horizontalScrollPolicy = "off";
+    setStyle("skinClass", Class(CustomPanelSkin));
 	}
 	
 	override protected function createChildren():void
 	{
-		super.createChildren();
-		
-		if (!headerDivider)
-		{
-			headerDivider = new Sprite();
-			titleBar.addChild(headerDivider);
-		}
-		
-		if (!controlsHolder)
-		{
-			controlsHolder = new HBox();
-			controlsHolder.setStyle("paddingRight", getStyle("paddingRight"));
-			controlsHolder.setStyle("horizontalAlign", "right");
-			controlsHolder.setStyle("verticalAlign", "middle");
-			controlsHolder.setStyle("horizontalGap", 3);
-			rawChildren.addChild(controlsHolder);
-		}
-		
-		if(!minimizeButton)
-		{
-			minimizeButton = new Button();
-			minimizeButton.width = 14;
-			minimizeButton.height = 14;
-			minimizeButton.styleName = "minimizeButton";
-			controlsHolder.addChild(minimizeButton);
-		}
-		
-		if (!maximizeRestoreButton)
-		{
-			maximizeRestoreButton = new Button();
-			maximizeRestoreButton.width = 14;
-			maximizeRestoreButton.height = 14;
-			maximizeRestoreButton.styleName = "maximizeRestoreButton";
-			controlsHolder.addChild(maximizeRestoreButton);
-		}
-		
+		super.createChildren();	
 		addEventListeners();
 	}
-	
-	override protected function updateDisplayList(unscaledWidth:Number, unscaledHeight:Number):void
-	{
-		super.updateDisplayList(unscaledWidth, unscaledHeight);
 		
-		// Shift the divider one pixel up if minimized so there isn't a gap between the left and right borders.
-		// The bottom border is removed if minimized.
-		var deltaY:Number = windowState == WINDOW_STATE_MINIMIZED ? -1 : 0;
-		var graphics:Graphics = headerDivider.graphics;
-		graphics.clear();
-		graphics.lineStyle(1, getStyle("borderColor"));
-		graphics.moveTo(1, titleBar.height + deltaY);
-		graphics.lineTo(titleBar.width, titleBar.height + deltaY);
-		
-		controlsHolder.y = titleBar.y;
-		controlsHolder.width = unscaledWidth;
-		controlsHolder.height = titleBar.height;
-		
-		titleTextField.width = titleBar.width - getStyle("paddingLeft") - getStyle("paddingRight");
-	}
-	
 	private function addEventListeners():void
 	{
 		titleBar.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDownTitleBar);
@@ -139,7 +94,7 @@ public class Pod extends Panel
 	private function onMouseDown(event:Event):void
 	{
 		// Moves the pod to the top of the z-index.
-		parent.setChildIndex(this, parent.numChildren - 1);
+    Group(parent).setElementIndex(this, Group(parent).numElements - 1);
 	}
 	
 	private function onClickMinimizeButton(event:MouseEvent):void
@@ -152,11 +107,11 @@ public class Pod extends Panel
 	public function minimize():void
 	{
 		// Hide the bottom border if minimized otherwise the headerDivider and bottom border will be staggered. 
-		setStyle("borderSides", "left top right");
-		windowState = WINDOW_STATE_MINIMIZED;
-		height = MINIMIZED_HEIGHT;
-		showControls = false;
-	}
+    windowState = WINDOW_STATE_MINIMIZED;
+    invalidateSkinState();
+    height = MINIMIZED_HEIGHT;
+    showControls = false;
+  }
 	
 	private function onClickMaximizeRestoreButton(event:MouseEvent=null):void
 	{
@@ -174,7 +129,8 @@ public class Pod extends Panel
 			windowState = WINDOW_STATE_DEFAULT;
 			maximizeRestoreButton.selected = false;
 		}
-	}
+    invalidateSkinState(); 
+  }
 	
 	public function maximize():void
 	{
@@ -189,7 +145,6 @@ public class Pod extends Panel
 		if (windowState == WINDOW_STATE_MINIMIZED)
 		{
 			// Add the bottom border back in case we were minimized.
-			setStyle("borderSides", "left top right bottom");
 			onClickMaximizeRestoreButton();
 		}
 	}
@@ -239,7 +194,15 @@ public class Pod extends Panel
 		_showControlsChanged = true;
 		invalidateProperties();
 	}
-	
+
+  override protected function getCurrentSkinState():String {
+    var returnState:String = "normal";
+    if (windowState == WINDOW_STATE_MINIMIZED) {
+      returnState = "minimized";
+    }
+    return returnState;
+  }
+
 	override protected function commitProperties():void
 	{
 		super.commitProperties();

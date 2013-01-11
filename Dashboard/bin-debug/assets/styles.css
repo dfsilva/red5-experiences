@@ -6,6 +6,12 @@ Application
 								scaleGridTop="94", scaleGridBottom="791", scaleGridLeft="350", scaleGridRight="690");
 }
 
+DataTip
+{
+  background-color: #FFFFFF;
+  color: #000000;
+}
+
 .maximizeRestoreButton
 {
 	up-skin:        	Embed("/assets/maximize_up.png");

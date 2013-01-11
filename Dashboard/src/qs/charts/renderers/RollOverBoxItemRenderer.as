@@ -3,6 +3,7 @@ package qs.charts.renderers
 
 import flash.display.Graphics;
 import flash.geom.Rectangle;
+import flash.geom.Point;
 import mx.charts.ChartItem;
 import mx.charts.chartClasses.GraphicsUtilities;
 import mx.core.IDataRenderer;
@@ -127,7 +128,7 @@ public class RollOverBoxItemRenderer extends UIComponent implements IDataRendere
 		g.moveTo(rc.left,rc.top);
 		g.beginFill(fillColor);
 		if (stroke)
-			stroke.apply(g);
+      stroke.apply(g, rc, new Point(rc.left,rc.top));
 		g.drawRect(rc.left,rc.top,rc.width,rc.height);
 		g.endFill();
 	}

@@ -5,7 +5,7 @@
 package com.esria.samples.dashboard.view
 {
 import flash.xml.XMLNode;
-import mx.containers.VBox;
+import spark.components.VGroup;
 import mx.controls.Alert;
 import mx.events.FlexEvent;
 import mx.rpc.events.FaultEvent;
@@ -14,7 +14,7 @@ import mx.rpc.http.HTTPService;
 import mx.utils.ObjectProxy;
 import mx.events.IndexChangedEvent;
 
-public class PodContentBase extends VBox
+public class PodContentBase extends VGroup
 {
 	[Bindable]
 	public var properties:XML; // Properties are from pods.xml.
